@@ -32,7 +32,6 @@ export const generateBillPdf = (batch: CalculatedBatch, settings: Settings) => {
   const tableData = [
     ['Machine Number', `Machine #${batch.machineNumber}`],
     ['Start Date', batch.startDate],
-    ['Completion Date', batch.endDate],
     ['Meter Processed', `${batch.meterValue.toFixed(2)} m`],
     ['Calculated FTotal', `${batch.ftotal}`],
     ['Average (Meter/FTotal)', `${batch.average.toFixed(2)}`],
@@ -94,7 +93,6 @@ const getBatchCsvData = (batches: CalculatedBatch[]) => {
         "Batch Number": b.batchNumber,
         "Machine": b.machineNumber,
         "Start Date": b.startDate,
-        "End Date": b.endDate,
         "Meter": b.meterValue,
         "Ftotal": b.ftotal,
         "Average": b.average
@@ -102,14 +100,14 @@ const getBatchCsvData = (batches: CalculatedBatch[]) => {
 }
 
 export const exportReportAsCsv = (report: MonthlyReport, batches: CalculatedBatch[]) => {
-    const headers = ["Batch Number", "Machine", "Start Date", "End Date", "Meter", "Ftotal", "Average"];
+    const headers = ["Batch Number", "Machine", "Start Date", "Meter", "Ftotal", "Average"];
     const data = getBatchCsvData(batches);
     const csv = convertToCsv(data, headers);
     downloadFile(csv, `report_${report.month.replace(' ', '_')}.csv`, 'text/csv;charset=utf-8;');
 };
 
 export const exportMachineReportAsCsv = (machineNumber: number, batches: CalculatedBatch[]) => {
-    const headers = ["Batch Number", "Start Date", "End Date", "Meter", "Ftotal", "Average"];
+    const headers = ["Batch Number", "Start Date", "Meter", "Ftotal", "Average"];
     const machineBatches = batches.filter(b => b.machineNumber === machineNumber);
     const data = getBatchCsvData(machineBatches);
     const csv = convertToCsv(data, headers);

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, createContext, useContext } from 'react';
 import type { Theme, Page, Batch, CalculatedBatch, Settings, MonthlyReport, BatchType } from './types';
 import { generateBillPdf, backupDataAsJson, exportReportAsCsv, exportMachineReportAsCsv } from './utils';
-import { GoogleGenAI } from "@google/genai";
 
 
 // Add Recharts to window type for TypeScript
@@ -20,11 +19,11 @@ declare global {
 const getTodayDateString = (): string => new Date().toISOString().split('T')[0];
 
 const MOCK_BATCHES: Omit<Batch, 'status'>[] = [
-    { id: '1', name: 'Autumn Collection Run 1', batchNumber: 'ACR001', machineNumber: 1, startDate: '2023-10-01', endDate: '2023-10-05', meterValue: 1250.5, color: '#16a34a' },
-    { id: '2', name: 'Winter Fabric Prep', batchNumber: 'WFP001', machineNumber: 2, startDate: '2023-10-03', endDate: '2023-10-08', meterValue: 2100.2, color: '#16a34a' },
-    { id: '3', name: 'Spring Pattern Test', batchNumber: 'SPT001', machineNumber: 1, startDate: '2023-10-10', endDate: '2023-10-15', meterValue: 950.0, color: '#f59e0b' },
-    { id: '4', name: 'Holiday Special Edition', batchNumber: 'HSE001', machineNumber: 3, startDate: '2023-10-12', endDate: '2023-10-20', meterValue: 3500.8, color: '#f59e0b' },
-    { id: '5', name: 'Denim Wash Experiment', batchNumber: 'DWE001', machineNumber: 2, startDate: '2023-10-18', endDate: '2023-10-25', meterValue: 2200.7, color: '#dc2626' },
+    { id: '1', name: 'Autumn Collection Run 1', batchNumber: 'ACR001', machineNumber: 1, startDate: '2023-10-01', meterValue: 1250.5, color: '#16a34a' },
+    { id: '2', name: 'Winter Fabric Prep', batchNumber: 'WFP001', machineNumber: 2, startDate: '2023-10-03', meterValue: 2100.2, color: '#16a34a' },
+    { id: '3', name: 'Spring Pattern Test', batchNumber: 'SPT001', machineNumber: 1, startDate: '2023-10-10', meterValue: 950.0, color: '#f59e0b' },
+    { id: '4', name: 'Holiday Special Edition', batchNumber: 'HSE001', machineNumber: 3, startDate: '2023-10-12', meterValue: 3500.8, color: '#f59e0b' },
+    { id: '5', name: 'Denim Wash Experiment', batchNumber: 'DWE001', machineNumber: 2, startDate: '2023-10-18', meterValue: 2200.7, color: '#dc2626' },
 ];
 
 const MOCK_BATCH_TYPES: BatchType[] = [
@@ -181,7 +180,6 @@ const ChevronRightIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24
 const DownloadIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>;
 const EditIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>;
 const DeleteIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>;
-const BrainIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15A2.5 2.5 0 0 1 9.5 22h-3A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2h3z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 2.5 2.5h3A2.5 2.5 0 0 0 20 19.5v-15A2.5 2.5 0 0 0 17.5 2h-3z"/><path d="M9 12h6"/></svg>;
 const CalculatorIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>;
 
 // ==================================
@@ -280,7 +278,7 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.Re
 
 const AddBatchModal: React.FC<{ isOpen: boolean; onClose: () => void; machineNumber?: number; }> = ({ isOpen, onClose, machineNumber }) => {
     const { addBatch, settings, batchTypes } = useAppContext();
-    const [formData, setFormData] = useState({ batchNumber: '', machineNumber: '1', startDate: getTodayDateString(), endDate: getTodayDateString(), meterValue: '', color: '#f59e0b' });
+    const [formData, setFormData] = useState({ batchNumber: '', machineNumber: '1', startDate: getTodayDateString(), meterValue: '', color: '#f59e0b' });
     const [errors, setErrors] = useState({ meterValue: '' });
 
     useEffect(() => {
@@ -290,7 +288,6 @@ const AddBatchModal: React.FC<{ isOpen: boolean; onClose: () => void; machineNum
                 batchNumber: firstBatchType.batchNumber,
                 machineNumber: machineNumber ? String(machineNumber) : '1',
                 startDate: getTodayDateString(),
-                endDate: getTodayDateString(),
                 meterValue: '',
                 color: firstBatchType.color
             });
@@ -300,7 +297,6 @@ const AddBatchModal: React.FC<{ isOpen: boolean; onClose: () => void; machineNum
                 batchNumber: '',
                 machineNumber: machineNumber ? String(machineNumber) : '1',
                 startDate: getTodayDateString(),
-                endDate: getTodayDateString(),
                 meterValue: '',
                 color: '#f59e0b'
             });
@@ -376,15 +372,9 @@ const AddBatchModal: React.FC<{ isOpen: boolean; onClose: () => void; machineNum
                         <label className="text-sm text-slate-500 dark:text-slate-400">Batch Color</label>
                         <input type="color" value={formData.color} onChange={e => setFormData({ ...formData, color: e.target.value })} className="h-8 w-14 p-0.5 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600 cursor-pointer" />
                     </div>
-                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-sm text-slate-500 dark:text-slate-400">Start Date</label>
-                            <input type="date" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600" />
-                        </div>
-                        <div>
-                            <label className="text-sm text-slate-500 dark:text-slate-400">End Date</label>
-                            <input type="date" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600" />
-                        </div>
+                     <div>
+                        <label className="text-sm text-slate-500 dark:text-slate-400">Start Date</label>
+                        <input type="date" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600" />
                     </div>
                     <div className="flex justify-end space-x-3 pt-4">
                         <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 font-semibold">Cancel</button>
@@ -465,15 +455,9 @@ const EditBatchModal: React.FC<{ isOpen: boolean; onClose: () => void; batchToEd
                         <label className="text-sm text-slate-500">Batch Color</label>
                         <input type="color" value={formData.color} onChange={e => setFormData({ ...formData, color: e.target.value })} className="h-8 w-14 p-0.5 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600 cursor-pointer" />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-sm text-slate-500">Start Date</label>
-                            <input type="date" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600" />
-                        </div>
-                        <div>
-                            <label className="text-sm text-slate-500">End Date</label>
-                            <input type="date" value={formData.endDate} onChange={e => setFormData({ ...formData, endDate: e.target.value })} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600" />
-                        </div>
+                    <div>
+                        <label className="text-sm text-slate-500">Start Date</label>
+                        <input type="date" value={formData.startDate} onChange={e => setFormData({ ...formData, startDate: e.target.value })} className="w-full p-2 border rounded bg-slate-50 dark:bg-slate-700 dark:border-slate-600" />
                     </div>
                     <div className="flex justify-end space-x-3 pt-4">
                         <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 font-semibold">Cancel</button>
@@ -746,16 +730,25 @@ const MachineCard: React.FC<{
                 <table className="w-full text-sm text-left">
                     <thead className="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-700 dark:text-slate-400">
                         <tr>
-                            <th className="p-3">Batch No</th><th className="p-3">FTotal</th>
-                            <th className="p-3">End Date</th><th className="p-3 text-right">Actions</th>
+                            <th className="p-3">Batch</th>
+                            <th className="p-3">Meter</th>
+                            <th className="p-3">FTotal</th>
+                            <th className="p-3">Average</th>
+                            <th className="p-3 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {batches.map(batch => (
                             <tr key={batch.id} className="border-b dark:border-slate-700">
-                                <td className="p-3 font-medium">{batch.batchNumber}</td>
+                                <td className="p-3 font-medium">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: batch.color || '#cccccc' }}></span>
+                                        <span>{batch.batchNumber}</span>
+                                    </div>
+                                </td>
+                                <td className="p-3">{batch.meterValue.toFixed(2)}</td>
                                 <td className="p-3">{batch.ftotal}</td>
-                                <td className="p-3">{batch.endDate}</td>
+                                <td className="p-3">{batch.average.toFixed(2)}</td>
                                 <td className="p-3 text-right">
                                     <div className="flex items-center justify-end space-x-1">
                                         <button onClick={() => onEditBatch(batch)} title="Edit Batch" className="p-1.5 text-slate-500 hover:text-blue-500 rounded-full hover:bg-slate-100 dark:hover:bg-slate-600"><EditIcon /></button>
@@ -767,6 +760,9 @@ const MachineCard: React.FC<{
                                 </td>
                             </tr>
                         ))}
+                         {batches.length === 0 && (
+                            <tr><td colSpan={5} className="text-center p-4 text-slate-500">No batch history.</td></tr>
+                        )}
                     </tbody>
                 </table>
             </div>
@@ -811,37 +807,8 @@ const MachinesPage: React.FC<{
     );
 };
 
-const SimpleMarkdown: React.FC<{ content: string }> = ({ content }) => {
-    // This simple renderer handles basic markdown formatting.
-    // It's not a full-fledged parser but works for the expected AI output.
-    const createMarkup = (text: string) => {
-        const html = text
-            // Headers
-            .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mt-3 mb-1">$1</h3>')
-            .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-4 mb-2">$1</h2>')
-            // Bold
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            // Unordered list items
-            .replace(/^\* (.*$)/gim, '<li class="ml-4 list-disc">$1</li>')
-            // Newlines
-            .replace(/\n/g, '<br />')
-            // Clean up extra breaks around list items
-            .replace(/<br \/><li/g, '<li')
-            .replace(/<\/li><br \/>/g, '</li>');
-
-        return { __html: html };
-    };
-
-    return <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={createMarkup(content)} />;
-};
-
 const ReportsPage: React.FC<{ calculatedBatches: CalculatedBatch[] }> = ({ calculatedBatches }) => {
-    const { settings, setNotification } = useAppContext();
     const [currentDate, setCurrentDate] = useState(new Date());
-
-    const [aiSummary, setAiSummary] = useState('');
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [aiError, setAiError] = useState<string | null>(null);
 
     const monthBatches = useMemo(() => {
         return calculatedBatches.filter(b => {
@@ -860,56 +827,6 @@ const ReportsPage: React.FC<{ calculatedBatches: CalculatedBatch[] }> = ({ calcu
         };
     }, [monthBatches, currentDate]);
 
-    const changeMonth = (amount: number) => {
-        setCurrentDate(prev => {
-            const newDate = new Date(prev);
-            newDate.setMonth(newDate.getMonth() + amount);
-            return newDate;
-        });
-        setAiSummary('');
-        setAiError(null);
-    };
-
-    const handleGenerateSummary = async () => {
-        if (!settings) return;
-        setIsGenerating(true);
-        setAiError(null);
-        setAiSummary('');
-
-        try {
-            const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
-            const prompt = `You are a production manager assistant for a textile company called '${settings.companyName}'.
-    Analyze the following data for ${monthlyReport.month} and provide a concise, insightful summary for the business owner.
-    Focus on key performance indicators, highlight successes, and identify potential areas for improvement.
-    Use Markdown for formatting, including headers, bold text, and bullet points.
-    
-    **Monthly Report Data:**
-    - Total Batches: ${monthlyReport.totalBatches}
-    - Total Meter Processed: ${monthlyReport.totalMeter.toFixed(2)}m
-    - Total FTotal: ${monthlyReport.totalFtotal}
-    
-    **Batches processed this month:**
-    ${monthBatches.length > 0 ? monthBatches.map(b => `- Batch ${b.batchNumber} (Machine #${b.machineNumber}): ${b.ftotal} FTotal`).join('\n') : 'No batches were processed this month.'}
-    
-    Please provide your analysis:`;
-            
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt,
-            });
-    
-            setAiSummary(response.text);
-    
-        } catch (e) {
-            console.error(e);
-            const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-            setAiError(`Failed to generate AI summary. Please check your connection or API key. Error: ${errorMessage}`);
-            setNotification('Error generating AI summary.');
-        } finally {
-            setIsGenerating(false);
-        }
-    };
-
     return (
         <div className="space-y-8">
             <div>
@@ -925,25 +842,6 @@ const ReportsPage: React.FC<{ calculatedBatches: CalculatedBatch[] }> = ({ calcu
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl shadow-lg border">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-semibold flex items-center space-x-2 text-brand-text dark:text-brand-text-dark">
-                        <BrainIcon />
-                        <span>AI-Powered Analysis</span>
-                    </h3>
-                    <button onClick={handleGenerateSummary} disabled={isGenerating} className="text-sm flex items-center space-x-2 bg-brand-teal/10 hover:bg-brand-teal/20 text-brand-teal-dark font-semibold px-3 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                        {isGenerating ? 'Generating...' : 'Generate Analysis'}
-                    </button>
-                </div>
-                {isGenerating && <div className="text-center p-4 text-slate-500">Generating summary, this may take a moment...</div>}
-                {aiError && <div className="text-center p-4 text-red-500 bg-red-50 dark:bg-red-900/20 rounded-lg">{aiError}</div>}
-                {aiSummary && (
-                    <div className="p-2 border-t dark:border-slate-700 mt-4">
-                        <SimpleMarkdown content={aiSummary} />
-                    </div>
-                )}
-            </div>
-
-            <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-xl shadow-lg border">
                  <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold">Batches this Month</h3>
                     <button onClick={() => exportReportAsCsv(monthlyReport as MonthlyReport, monthBatches)} className="text-sm flex items-center space-x-2 bg-brand-teal/10 hover:bg-brand-teal/20 text-brand-teal-dark font-semibold px-3 py-2 rounded-lg">
@@ -955,8 +853,10 @@ const ReportsPage: React.FC<{ calculatedBatches: CalculatedBatch[] }> = ({ calcu
                    <table className="w-full text-sm text-left">
                      <thead className="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-700">
                         <tr>
-                            <th className="p-3">Batch No</th><th className="p-3">Machine</th>
-                            <th className="p-3">FTotal</th><th className="p-3">End Date</th>
+                            <th className="p-3">Batch No</th>
+                            <th className="p-3">Machine</th>
+                            <th className="p-3">Start Date</th>
+                            <th className="p-3">FTotal</th>
                         </tr>
                      </thead>
                       <tbody>
@@ -964,8 +864,8 @@ const ReportsPage: React.FC<{ calculatedBatches: CalculatedBatch[] }> = ({ calcu
                             <tr key={batch.id} className="border-b dark:border-slate-700">
                                 <td className="p-3 font-medium">{batch.batchNumber}</td>
                                 <td className="p-3">Machine #{batch.machineNumber}</td>
+                                <td className="p-3">{batch.startDate}</td>
                                 <td className="p-3">{batch.ftotal}</td>
-                                <td className="p-3">{batch.endDate}</td>
                             </tr>
                         ))}
                         {monthBatches.length === 0 && (

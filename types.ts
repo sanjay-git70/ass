@@ -16,7 +16,6 @@ export interface Batch {
   batchNumber: string;
   machineNumber: number;
   startDate: string; // YYYY-MM-DD
-  endDate: string; // YYYY-MM-DD
   meterValue: number;
   status: BatchStatus;
   color?: string; // e.g., '#FF5733' for manual color selection
