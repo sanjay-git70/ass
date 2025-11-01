@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNGI4YTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTUgYy0xLjcgMS43LTQuMiAyLjUtNi41IDIuNXMtNC44LS44LTYuNS0yLjUiLz48cGF0aCBkPSJNM3EgOWMtMS43LTEuNy00LjItMi41LTYuNS0yLjVTMi4yIDYuOCAuNSA4LjUiLz48cGF0aCBkPSJNMjEgOWExMiAxMiAwIDAgMC02LjUtMi41QzEyLjIgNi41IDkuNyA3LjMgOCA5Ii8+PHBhdGggZD0iTTMgMTVjMS43IDEuNyA0LjIgMi41IDYuNSAyLjVzNC44LS44IDYuNS0yLjUiLz48bGluZSB4MT0iMTIiIHkxPSIyIiB4Mj0iMTIiIHkyPSIyMiIgLz48L3N2Zz4=" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geetha Tex 🧵 Batch Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'brand-cream': '#FFFBF5',
+              'brand-teal': {
+                light: '#5eead4',
+                DEFAULT: '#14b8a6',
+                dark: '#0f766e',
+              },
+              'brand-brown': {
+                light: '#fde047',
+                DEFAULT: '#a16207',
+                dark: '#713f12',
+              },
+              'brand-text': '#44403c', // stone-700
+              'brand-text-dark': '#d6d3d1', // stone-300
+            }
+          }
+        }
+      }
+    </script>
+    <!-- JSPDF for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- JSPDF-AUTOTABLE for PDF Tables -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.autotable.min.js"></script>
+    <!-- Recharts for Charts -->
+    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
+
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-brand-cream dark:bg-slate-900" style="background-image: url('data:image/svg+xml,%3Csvg width=\"6\" height=\"6\" viewBox=\"0 0 6 6\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%239C92AC\" fill-opacity=\"0.07\" fill-rule=\"evenodd\"%3E%3Cpath d=\"M5 0h1L0 6V5zM6 5v1H5z\"/%3E%3C/g%3E%3C/svg%3E');">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
